@@ -109,7 +109,7 @@
                 <h3>cuci sepatu</h3>
             </div>
         </div>
-        <a href="Pemesanan.php" class="btn">Selengkapnya</a>
+        <a href="pemesanan.php" class="btn">Selengkapnya</a>
     </section>
 
     <section class="operational-hours">
