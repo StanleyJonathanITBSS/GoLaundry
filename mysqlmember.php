@@ -1,5 +1,4 @@
 <?php
-
 include 'config.php';
 
 $conn = getConnection();
@@ -10,36 +9,33 @@ $nama_belakang = isset($_POST['nama_belakang']) ? $_POST['nama_belakang'] : '';
 $no_hp = isset($_POST['no_hp']) ? $_POST['no_hp'] : '';
 $alamat = isset($_POST['alamat']) ? $_POST['alamat'] : '';
 
-
-// Check if NIK already exists
-$query = "SELECT * FROM members WHERE no_hp = ?";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $nik);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows > 0) {
-    header("Location: noused.php");
-    exit();
-}
-
-$stmt->close();
-
 // Insert new member data
-$query = "INSERT INTO members (first_name, last_name, nik, phone_number, address, email, ktp) VALUES (?, ?, ?, ?, ?, ?, ?)";
+$query = "INSERT INTO members (first_name, last_name, phone_number, address) VALUES (?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
-$stmt->bind_param("sssssss", $nama_depan, $nama_belakang, $nik, $no_hp, $alamat, $email, $ktp);
+$stmt->bind_param("ssss", $nama_depan, $nama_belakang, $no_hp, $alamat);
 
 if ($stmt->execute()) {
-    // On successful insertion, redirect to success page
-    header("Location: sukses.php");
-    exit();
+    // On successful insertion
+    $response["message"] = "Member berhasil dibuat!";
+    if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+        // Not an AJAX request
+        header("Location: sukses.php");
+        exit();
+    }
 } else {
     // If execution fails, handle the error
-    header('Location: gagal.php');
+    $response["error"] = "Terjadi kesalahan saat memproses permintaan.";
+    if (!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) !== 'xmlhttprequest') {
+        // Not an AJAX request
+        header("Location: gagal.php");
+        exit();
+    }
 }
+
+// Send JSON response for AJAX requests
+header('Content-Type: application/json');
+echo json_encode($response);
+
 
 $stmt->close();
 $conn->close();
-?>
-1

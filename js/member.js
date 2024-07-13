@@ -52,24 +52,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Send form data to server using fetch API
         fetch('mysqlmember.php', {
             method: 'POST',
-            body: formData
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         })
-        .then(response => response.json())
+        .then(response => response.json())  // Expect JSON response
         .then(data => {
             if (data.message) {
-                alert("Member berhasil dibuat!");
-                form.reset(); 
-                } else {
-                    alert(data.error); // Show any other error messages
-                }
-            })
+                alert(data.message);
+                form.reset();
+            } else {
+                alert(data.error); // Show any other error messages
+            }
+        })
         .catch(error => {
             console.error('Error:', error);
             alert('Terjadi kesalahan saat memproses permintaan.');
         });
     });
 });
-
 
 function validateForm() {
     const form = document.querySelector('.member-form');
@@ -84,13 +86,6 @@ function validateForm() {
                 errorMessage.textContent = `${input.previousElementSibling.textContent} harus diisi.`;
             } else if (input.type === 'number' && input.validity.patternMismatch) {
                 errorMessage.textContent = `${input.previousElementSibling.textContent} harus berupa angka.`;
-            } else if (input.type === 'email' && input.validity.typeMismatch) {
-                errorMessage.textContent = `${input.previousElementSibling.textContent} harus berupa email yang valid.`;
-            } 
-        } else if (input.name === 'nik') {
-            if (input.value.length !== 16) {
-                isValid = false;
-                errorMessage.textContent = "NIK harus tepat 16 digit.";
             } else {
                 errorMessage.textContent = "";
             }
